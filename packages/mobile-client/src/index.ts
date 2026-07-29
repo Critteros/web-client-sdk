@@ -24,6 +24,31 @@ export {
   AudioDeviceType,
   useAudioOutput,
   pushAudioSamples,
+  useVoIPEvents,
+  useTelecom,
+  useTelecomEvent,
+  fulfillIncomingCallConnected,
+  failIncomingCallConnected,
+  getPendingAnswerRequestId,
+  reportOutgoingCallConnected,
+  setCallHeld,
+  setCallMuted,
+  isCallHeld,
+} from '@fishjam-cloud/react-native-webrtc';
+
+export type { VoIPEventHandlers, VoIPCallIntent, VoIPIncomingPayload } from '@fishjam-cloud/react-native-webrtc';
+
+export { VoIPProvider } from './voip/VoIPProvider';
+export type { VoIPProviderProps } from './voip/VoIPProvider';
+export { useVoIP } from './voip/VoIPContext';
+export type { CurrentCall, VoIPCallStatus, VoIPContextValue } from './voip/VoIPContext';
+
+export type {
+  CallEndedReason,
+  TelecomConfig,
+  TelecomEvent,
+  TelecomEventType,
+  UseTelecomResult,
 } from '@fishjam-cloud/react-native-webrtc';
 
 export type {

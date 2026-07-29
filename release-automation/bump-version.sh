@@ -65,6 +65,9 @@ echo "Updated react-native-custom-video-source to $VERSION"
 corepack yarn workspace @fishjam-cloud/react-native-vision-camera-source version "$VERSION"
 echo "Updated react-native-vision-camera-source to $VERSION"
 
+corepack yarn workspace @fishjam-cloud/ios-expo-voip version "$VERSION"
+echo "Updated ios-expo-voip to $VERSION"
+
 # Run proto generation
 if corepack yarn gen:proto; then
     echo "Protos generated."

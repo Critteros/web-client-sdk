@@ -307,6 +307,71 @@ const withFishjamVoIPBackgroundMode: ConfigPlugin<FishjamPluginOptions> = (confi
     return configuration;
   });
 
+const withFishjamVoIPTimeouts: ConfigPlugin<FishjamPluginOptions> = (config, props) =>
+  withInfoPlist(config, (configuration) => {
+    const timeouts = [
+      ['VoIPIncomingCallTimeout', 'incomingCallTimeout'],
+      ['VoIPOutgoingCallTimeout', 'outgoingCallTimeout'],
+      ['VoIPFulfillAnswerTimeout', 'fulfillAnswerCallTimeout'],
+    ] as const;
+
+    timeouts.forEach(([key, option]) => {
+      const seconds = props?.voip?.[option];
+      if (seconds === undefined) {
+        return;
+      }
+      if (!Number.isFinite(seconds) || seconds <= 0) {
+        throw new Error(`Fishjam VoIP ${option} must be a positive finite number of seconds.`);
+      }
+      configuration.modResults[key] = Math.floor(seconds);
+    });
+
+    return configuration;
+  });
+
+const withFishjamExpoVoip: ConfigPlugin<FishjamPluginOptions> = (config, props) => {
+  if (!props?.voip) {
+    return config;
+  }
+
+  return withInfoPlist(config, (configuration) => {
+    try {
+      require.resolve('@fishjam-cloud/ios-expo-voip/package.json', {
+        paths: [configuration.modRequest.projectRoot],
+      });
+    } catch {
+      throw new Error(
+        'Fishjam VoIP options are enabled but @fishjam-cloud/ios-expo-voip is not installed. ' +
+          'Run: npx expo install @fishjam-cloud/ios-expo-voip',
+      );
+    }
+
+    configuration.modResults['FishjamVoIPEnabled'] = true;
+    return configuration;
+  });
+};
+
+const withFishjamVoIPRecentsAndIntents: ConfigPlugin<FishjamPluginOptions> = (config, props) => {
+  if (!props?.voip) {
+    return config;
+  }
+
+  return withInfoPlist(config, (configuration) => {
+    const activityTypes = new Set(
+      Array.isArray(configuration.modResults.NSUserActivityTypes)
+        ? (configuration.modResults.NSUserActivityTypes as string[])
+        : [],
+    );
+    // The audio/video variants are deprecated in favour of INStartCallIntent, but Recents
+    // redial still delivers them, so all three must be declared.
+    activityTypes.add('INStartCallIntent');
+    activityTypes.add('INStartAudioCallIntent');
+    activityTypes.add('INStartVideoCallIntent');
+    configuration.modResults.NSUserActivityTypes = Array.from(activityTypes);
+    return configuration;
+  });
+};
+
 const withFishjamPictureInPicture: ConfigPlugin<FishjamPluginOptions> = (config, props) =>
   withInfoPlist(config, (configuration) => {
     if (props?.ios?.supportsPictureInPicture) {
@@ -330,6 +395,9 @@ const withFishjamIos: ConfigPlugin<FishjamPluginOptions> = (config, props) => {
   });
   config = withFishjamPictureInPicture(config, props);
   config = withFishjamVoIPBackgroundMode(config, props);
+  config = withFishjamVoIPTimeouts(config, props);
+  config = withFishjamExpoVoip(config, props);
+  config = withFishjamVoIPRecentsAndIntents(config, props);
   return config;
 };
 

@@ -12,9 +12,11 @@
     "packages/mobile-client",
     "packages/react-native-custom-video-source",
     "packages/react-native-vision-camera-source",
+    "packages/ios-expo-voip",
     "packages/react-native-webrtc",
     "examples/react-client/*",
     "examples/mobile-client/*",
+    "examples/mobile-client/voip-call/app",
     "e2e-tests/webrtc-client",
     "e2e-tests/react-client",
     "e2e-tests/livestream-client"
